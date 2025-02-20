@@ -1,3 +1,9 @@
+import SearchBar from "@/app/components/Gallery/SearchBar";
+
 export default function Home() {
-  return <div>hello</div>;
+  return (
+    <div>
+      <SearchBar />
+    </div>
+  );
 }
