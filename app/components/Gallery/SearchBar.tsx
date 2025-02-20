@@ -20,7 +20,7 @@ const SearchBar = () => {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <h1 className={`${orbitron.className} text-2xl font-bold`}>
           <span className="text-indigo-600">Inspire</span>{" "}
-          <span className="text-purple-500 ">Gallery</span>
+          <span className="text-purple-500 italic">Gallery</span>
         </h1>
         <div className="relative w-96">
           <input
