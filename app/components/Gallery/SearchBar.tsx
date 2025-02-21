@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Orbitron } from "next/font/google";
+import Image from "next/image";
 
 const orbitron = Orbitron({
   weight: ["700"],
@@ -18,9 +19,18 @@ const SearchBar = () => {
   return (
     <nav className="w-full bg-white shadow-md px-6 py-4">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <h1 className={`${orbitron.className} text-2xl font-bold`}>
-          <span className="text-indigo-600">Inspire</span>{" "}
-          <span className="text-purple-500 italic">Gallery</span>
+        <h1 className={`${orbitron.className} text-3xl font-bold`}>
+          <Image
+            src="/logo1.png"
+            alt="Gallery Logo"
+            width={120}
+            height={120}
+            className="inline-block mr-2 rounded-[55px]"
+          />
+          <span className="text-[#9b2452]">Inspire</span>{" "}
+          <span className="text-[#FFA500] italic">Gallery</span>{" "}
+          {/* <span className="text-indigo-600">Inspire</span>{" "}
+          <span className="text-purple-500 italic">Gallery</span> */}
         </h1>
         <div className="relative w-96">
           <input
