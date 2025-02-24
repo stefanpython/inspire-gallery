@@ -26,6 +26,7 @@ const SearchBar = () => {
             width={120}
             height={120}
             className="inline-block mr-2 rounded-[55px]"
+            priority
           />
           <span className="text-[#9b2452]">Inspire</span>{" "}
           <span className="text-[#FFA500] italic">Gallery</span>{" "}

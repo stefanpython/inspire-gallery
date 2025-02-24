@@ -1,13 +1,15 @@
+// components/Gallery/Gallery.tsx
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
+import ImageCard from "./ImageCard";
 
 interface PexelsPhoto {
   id: number;
   src: {
     medium: string;
     large: string;
+    original: string;
   };
   alt: string;
 }
@@ -15,11 +17,8 @@ interface PexelsPhoto {
 const fetchImages = async (query: string): Promise<PexelsPhoto[]> => {
   try {
     const res = await fetch(`/api/pexels?query=${query}`);
-
     if (!res.ok) throw new Error("Failed to fetch images");
-
     const data = await res.json();
-
     return data.photos || [];
   } catch (error) {
     console.error("Error fetching images:", error);
@@ -35,19 +34,9 @@ export default function Gallery() {
   }, []);
 
   return (
-    <div className="grid grid-cols-3 gap-4">
-      {images.map((img) => (
-        <div key={img.id} className="relative w-full h-64">
-          <Image
-            src={img.src.large}
-            alt={img.alt}
-            fill
-            priority
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            style={{ objectFit: "cover" }}
-            className="rounded-lg shadow-lg"
-          />
-        </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+      {images.map((photo) => (
+        <ImageCard key={photo.id} photo={photo} />
       ))}
     </div>
   );
