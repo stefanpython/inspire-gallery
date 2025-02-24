@@ -34,7 +34,7 @@ export default function Gallery() {
   }, []);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 sm:px-44">
       {images.map((photo) => (
         <ImageCard key={photo.id} photo={photo} />
       ))}

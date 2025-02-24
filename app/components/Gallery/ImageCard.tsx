@@ -3,7 +3,7 @@
 
 import Image from "next/image";
 import { Download } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 interface ImageCardProps {
   photo: {
@@ -19,6 +19,26 @@ interface ImageCardProps {
 
 export default function ImageCard({ photo }: ImageCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
+      ) {
+        setIsModalOpen(false);
+      }
+    };
+
+    if (isModalOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isModalOpen]);
 
   const handleDownload = async () => {
     try {
@@ -40,7 +60,7 @@ export default function ImageCard({ photo }: ImageCardProps) {
   return (
     <>
       <div
-        className="relative w-full h-64 cursor-pointer"
+        className="relative w-full h-64 cursor-pointer hover:scale-105 transition-transform duration-300"
         onClick={() => setIsModalOpen(true)}
       >
         <Image
@@ -55,7 +75,10 @@ export default function ImageCard({ photo }: ImageCardProps) {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
-          <div className="relative w-full max-w-5xl h-full max-h-[90vh] m-4 bg-white rounded-lg overflow-hidden">
+          <div
+            ref={modalRef}
+            className="relative w-full max-w-5xl h-full max-h-[90vh] m-4 bg-white rounded-lg overflow-hidden"
+          >
             {/* Close button */}
             <button
               onClick={() => setIsModalOpen(false)}
