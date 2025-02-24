@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import ImageCard from "./ImageCard";
+import Categories from "./Categories";
 
 interface PexelsPhoto {
   id: number;
@@ -26,11 +27,11 @@ export default function Gallery() {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const loadingRef = useRef<HTMLDivElement>(null);
-  const [query, setQuery] = useState("nature"); // You can make this dynamic later
+  const [category, setCategory] = useState("nature");
 
   const fetchImages = async (pageNumber: number): Promise<PexelsResponse> => {
     const res = await fetch(
-      `/api/pexels?query=${query}&page=${pageNumber}&per_page=80`
+      `/api/pexels?query=${category}&page=${pageNumber}&per_page=80`
     );
     if (!res.ok) throw new Error("Failed to fetch images");
     return res.json();
@@ -51,7 +52,6 @@ export default function Gallery() {
       setImages((prevImages) => [...prevImages, ...data.photos]);
       setPage((prevPage) => prevPage + 1);
 
-      // Check if we've reached the total number of results
       if (data.total_results <= page * 80) {
         setHasMore(false);
       }
@@ -60,7 +60,15 @@ export default function Gallery() {
     } finally {
       setLoading(false);
     }
-  }, [page, loading, hasMore, query]);
+  }, [page, loading, hasMore, category]);
+
+  // Handle category change
+  const handleCategoryChange = (newCategory: string) => {
+    setImages([]); // Clear current images
+    setPage(1); // Reset page
+    setHasMore(true); // Reset hasMore
+    setCategory(newCategory);
+  };
 
   // Intersection Observer setup
   useEffect(() => {
@@ -80,32 +88,39 @@ export default function Gallery() {
     return () => observer.disconnect();
   }, [loadMoreImages, hasMore]);
 
-  // Initial load
+  // Initial load and category change load
   useEffect(() => {
     loadMoreImages();
-  }, []);
+  }, [category]);
 
   return (
-    <div className="container mx-auto px-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {images.map((photo) => (
-          <ImageCard key={photo.id} photo={photo} />
-        ))}
-      </div>
+    <div className="flex flex-col w-full">
+      <Categories
+        onCategorySelect={handleCategoryChange}
+        currentCategory={category}
+      />
 
-      {/* Loading indicator and sentinel */}
-      <div
-        ref={loadingRef}
-        className="w-full h-20 flex items-center justify-center"
-      >
-        {loading && (
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
-        )}
-        {!hasMore && images.length > 0 && (
-          <p className="text-gray-500 text-center py-4">
-            No more images to load
-          </p>
-        )}
+      <div className="container mx-auto px-4 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {images.map((photo) => (
+            <ImageCard key={photo.id} photo={photo} />
+          ))}
+        </div>
+
+        {/* Loading indicator and sentinel */}
+        <div
+          ref={loadingRef}
+          className="w-full h-20 flex items-center justify-center"
+        >
+          {loading && (
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+          )}
+          {!hasMore && images.length > 0 && (
+            <p className="text-gray-500 text-center py-4">
+              No more images to load
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
