@@ -21,21 +21,31 @@ const SearchBar = () => {
     setSearchTerm(searchQuery); // Only update the search term when form is submitted
   };
 
+  const handleReset = () => {
+    setSearchQuery(""); // Clear the search input
+    setSearchTerm(""); // Clear the search term to show categories again
+  };
+
   return (
     <nav className="w-full bg-white shadow-md px-6 py-2 border-b border-gray-200">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <h1 className={`${orbitron.className} text-3xl font-bold`}>
-          <Image
-            src="/logo1.png"
-            alt="Gallery Logo"
-            width={100}
-            height={100}
-            className="inline-block mr-2 rounded-[55px]"
-            priority
-          />
-          <span className="text-[#9b2452]">Inspire</span>{" "}
-          <span className="text-[#FFA500] italic">Gallery</span>
-        </h1>
+        <button
+          onClick={handleReset}
+          className="flex items-center focus:outline-none"
+        >
+          <h1 className={`${orbitron.className} text-3xl font-bold`}>
+            <Image
+              src="/logo1.png"
+              alt="Gallery Logo"
+              width={100}
+              height={100}
+              className="inline-block mr-2 rounded-[55px]"
+              priority
+            />
+            <span className="text-[#9b2452]">Inspire</span>{" "}
+            <span className="text-[#FFA500] italic">Gallery</span>
+          </h1>
+        </button>
         <form onSubmit={handleSubmit} className="relative w-96">
           <input
             type="text"
