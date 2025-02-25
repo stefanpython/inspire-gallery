@@ -1,9 +1,9 @@
-// components/Gallery/Gallery.tsx
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import ImageCard from "./ImageCard";
 import Categories from "./Categories";
+import { useSearchContext } from "./SearchContext";
 
 interface PexelsPhoto {
   id: number;
@@ -28,10 +28,14 @@ export default function Gallery() {
   const [hasMore, setHasMore] = useState(true);
   const loadingRef = useRef<HTMLDivElement>(null);
   const [category, setCategory] = useState("nature");
+  const { searchTerm } = useSearchContext();
 
   const fetchImages = async (pageNumber: number): Promise<PexelsResponse> => {
+    const query = searchTerm || category;
     const res = await fetch(
-      `/api/pexels?query=${category}&page=${pageNumber}&per_page=80`
+      `/api/pexels?query=${encodeURIComponent(
+        query
+      )}&page=${pageNumber}&per_page=80`
     );
     if (!res.ok) throw new Error("Failed to fetch images");
     return res.json();
@@ -60,7 +64,7 @@ export default function Gallery() {
     } finally {
       setLoading(false);
     }
-  }, [page, loading, hasMore, category]);
+  }, [page, loading, hasMore, category, searchTerm]);
 
   // Handle category change
   const handleCategoryChange = (newCategory: string) => {
@@ -69,6 +73,13 @@ export default function Gallery() {
     setHasMore(true); // Reset hasMore
     setCategory(newCategory);
   };
+
+  // Reset images when search term changes
+  useEffect(() => {
+    setImages([]);
+    setPage(1);
+    setHasMore(true);
+  }, [searchTerm]);
 
   // Intersection Observer setup
   useEffect(() => {
@@ -88,17 +99,19 @@ export default function Gallery() {
     return () => observer.disconnect();
   }, [loadMoreImages, hasMore]);
 
-  // Initial load and category change load
+  // Initial load and category/search change load
   useEffect(() => {
     loadMoreImages();
-  }, [category]);
+  }, [category, searchTerm]);
 
   return (
     <div className="flex flex-col w-full">
-      <Categories
-        onCategorySelect={handleCategoryChange}
-        currentCategory={category}
-      />
+      {!searchTerm && (
+        <Categories
+          onCategorySelect={handleCategoryChange}
+          currentCategory={category}
+        />
+      )}
 
       <div className="container mx-auto px-4 mt-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -107,7 +120,6 @@ export default function Gallery() {
           ))}
         </div>
 
-        {/* Loading indicator and sentinel */}
         <div
           ref={loadingRef}
           className="w-full h-20 flex items-center justify-center"
