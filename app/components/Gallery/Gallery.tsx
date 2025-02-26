@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import ImageCard from "./ImageCard";
+import VideoCard from "./VideoCard";
 import Categories from "./Categories";
 import { useSearchContext } from "./SearchContext";
 
@@ -15,78 +16,100 @@ interface PexelsPhoto {
   alt: string;
 }
 
+interface PexelsVideo {
+  id: number;
+  video_files: Array<{
+    link: string;
+    quality: string;
+    width: number;
+    height: number;
+  }>;
+  image: string;
+  duration: number;
+}
+
 interface PexelsResponse {
-  photos: PexelsPhoto[];
+  photos?: PexelsPhoto[];
+  videos?: PexelsVideo[];
   total_results: number;
   page: number;
 }
 
 export default function Gallery() {
   const [images, setImages] = useState<PexelsPhoto[]>([]);
+  const [videos, setVideos] = useState<PexelsVideo[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const loadingRef = useRef<HTMLDivElement>(null);
   const [category, setCategory] = useState("nature");
-  const { searchTerm } = useSearchContext();
+  const { searchTerm, mediaType } = useSearchContext();
 
-  const fetchImages = async (pageNumber: number): Promise<PexelsResponse> => {
+  const fetchMedia = async (pageNumber: number): Promise<PexelsResponse> => {
     const query = searchTerm || category;
+    const endpoint = mediaType === "images" ? "pexels" : "pexels/videos";
     const res = await fetch(
-      `/api/pexels?query=${encodeURIComponent(
+      `/api/${endpoint}?query=${encodeURIComponent(
         query
       )}&page=${pageNumber}&per_page=80`
     );
-    if (!res.ok) throw new Error("Failed to fetch images");
+    if (!res.ok) throw new Error("Failed to fetch media");
     return res.json();
   };
 
-  const loadMoreImages = useCallback(async () => {
+  const loadMoreMedia = useCallback(async () => {
     if (loading || !hasMore) return;
 
     try {
       setLoading(true);
-      const data = await fetchImages(page);
+      const data = await fetchMedia(page);
 
-      if (data.photos.length === 0) {
+      if (
+        (data.photos?.length === 0 && mediaType === "images") ||
+        (data.videos?.length === 0 && mediaType === "videos")
+      ) {
         setHasMore(false);
         return;
       }
 
-      setImages((prevImages) => [...prevImages, ...data.photos]);
+      if (mediaType === "images" && data.photos) {
+        setImages((prevImages) => [...prevImages, ...data.photos!]);
+      } else if (mediaType === "videos" && data.videos) {
+        setVideos((prevVideos) => [...prevVideos, ...data.videos!]);
+      }
+
       setPage((prevPage) => prevPage + 1);
 
       if (data.total_results <= page * 80) {
         setHasMore(false);
       }
     } catch (error) {
-      console.error("Error fetching more images:", error);
+      console.error("Error fetching more media:", error);
     } finally {
       setLoading(false);
     }
-  }, [page, loading, hasMore, category, searchTerm]);
+  }, [page, loading, hasMore, category, searchTerm, mediaType]);
 
-  // Handle category change
   const handleCategoryChange = (newCategory: string) => {
-    setImages([]); // Clear current images
-    setPage(1); // Reset page
-    setHasMore(true); // Reset hasMore
+    setImages([]);
+    setVideos([]);
+    setPage(1);
+    setHasMore(true);
     setCategory(newCategory);
   };
 
-  // Reset images when search term changes
   useEffect(() => {
     setImages([]);
+    setVideos([]);
     setPage(1);
     setHasMore(true);
-  }, [searchTerm]);
+  }, [searchTerm, mediaType]);
 
-  // Intersection Observer setup
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasMore) {
-          loadMoreImages();
+          loadMoreMedia();
         }
       },
       { threshold: 0.1 }
@@ -97,12 +120,11 @@ export default function Gallery() {
     }
 
     return () => observer.disconnect();
-  }, [loadMoreImages, hasMore]);
+  }, [loadMoreMedia, hasMore]);
 
-  // Initial load and category/search change load
   useEffect(() => {
-    loadMoreImages();
-  }, [category, searchTerm]);
+    loadMoreMedia();
+  }, [category, searchTerm, mediaType]);
 
   return (
     <div className="flex flex-col w-full">
@@ -115,9 +137,10 @@ export default function Gallery() {
 
       <div className="container mx-auto px-4 mt-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {images.map((photo) => (
-            <ImageCard key={photo.id} photo={photo} />
-          ))}
+          {mediaType === "images" &&
+            images.map((photo) => <ImageCard key={photo.id} photo={photo} />)}
+          {mediaType === "videos" &&
+            videos.map((video) => <VideoCard key={video.id} video={video} />)}
         </div>
 
         <div
@@ -127,9 +150,9 @@ export default function Gallery() {
           {loading && (
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
           )}
-          {!hasMore && images.length > 0 && (
+          {!hasMore && (images.length > 0 || videos.length > 0) && (
             <p className="text-gray-500 text-center py-4">
-              No more images to load
+              No more {mediaType} to load
             </p>
           )}
         </div>
