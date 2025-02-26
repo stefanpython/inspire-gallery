@@ -7,6 +7,8 @@ interface SearchContextType {
   setSearchQuery: (query: string) => void;
   searchTerm: string;
   setSearchTerm: (term: string) => void;
+  mediaType: "images" | "videos";
+  setMediaType: (type: "images" | "videos") => void;
 }
 
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
@@ -14,10 +16,18 @@ const SearchContext = createContext<SearchContextType | undefined>(undefined);
 export function SearchProvider({ children }: { children: ReactNode }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [mediaType, setMediaType] = useState<"images" | "videos">("images");
 
   return (
     <SearchContext.Provider
-      value={{ searchQuery, setSearchQuery, searchTerm, setSearchTerm }}
+      value={{
+        searchQuery,
+        setSearchQuery,
+        searchTerm,
+        setSearchTerm,
+        mediaType,
+        setMediaType,
+      }}
     >
       {children}
     </SearchContext.Provider>
