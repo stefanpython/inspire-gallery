@@ -10,7 +10,13 @@ const orbitron = Orbitron({
 });
 
 const SearchBar = () => {
-  const { searchQuery, setSearchQuery, setSearchTerm } = useSearchContext();
+  const {
+    searchQuery,
+    setSearchQuery,
+    setSearchTerm,
+    mediaType,
+    setMediaType,
+  } = useSearchContext();
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -18,12 +24,12 @@ const SearchBar = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setSearchTerm(searchQuery); // Only update the search term when form is submitted
+    setSearchTerm(searchQuery);
   };
 
   const handleReset = () => {
-    setSearchQuery(""); // Clear the search input
-    setSearchTerm(""); // Clear the search term to show categories again
+    setSearchQuery("");
+    setSearchTerm("");
   };
 
   return (
@@ -46,32 +52,44 @@ const SearchBar = () => {
             <span className="text-[#FFA500] italic">Gallery</span>
           </h1>
         </button>
-        <form onSubmit={handleSubmit} className="relative w-96">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={handleSearch}
-            placeholder="Search images..."
-            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-          <button
-            type="submit"
-            className="absolute right-3 top-2.5 h-5 w-5 text-gray-400 cursor-pointer"
+        <form onSubmit={handleSubmit} className="relative w-96 flex gap-2">
+          <select
+            value={mediaType}
+            onChange={(e) =>
+              setMediaType(e.target.value as "images" | "videos")
+            }
+            className="px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <svg
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
+            <option value="images">Images</option>
+            <option value="videos">Videos</option>
+          </select>
+          <div className="relative flex-1">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={handleSearch}
+              placeholder="Search..."
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <button
+              type="submit"
+              className="absolute right-3 top-2.5 h-5 w-5 text-gray-400 cursor-pointer"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-          </button>
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </button>
+          </div>
         </form>
       </div>
     </nav>
