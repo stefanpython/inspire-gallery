@@ -41,7 +41,7 @@ const SearchBar = () => {
         >
           <h1 className={`${orbitron.className} text-3xl font-bold`}>
             <Image
-              src="/logo1.png"
+              src="/logo.png"
               alt="Gallery Logo"
               width={100}
               height={100}
