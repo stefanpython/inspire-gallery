@@ -2,6 +2,8 @@
 
 Infinity Gallery is a web application that allows users to search for and download high-quality images and videos using the Pexels API. Built with Next.js and TypeScript, it provides a smooth and responsive experience.
 
+LIVE [HERE](https://inspire-gallery.vercel.app/)
+
 ## Features
 
 - 🔍 Search for images and videos from Pexels
