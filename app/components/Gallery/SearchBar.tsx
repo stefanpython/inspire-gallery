@@ -52,13 +52,16 @@ const SearchBar = () => {
             <span className="text-[#FFA500] italic">Gallery</span>
           </h1>
         </button>
-        <form onSubmit={handleSubmit} className="relative w-96 flex gap-2">
+        <form
+          onSubmit={handleSubmit}
+          className="relative w-full sm:w-96 flex flex-col sm:flex-row gap-2"
+        >
           <select
             value={mediaType}
             onChange={(e) =>
               setMediaType(e.target.value as "images" | "videos")
             }
-            className="px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:block mb-2 sm:mb-0"
           >
             <option value="images">Images</option>
             <option value="videos">Videos</option>
